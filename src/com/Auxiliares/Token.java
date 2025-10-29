@@ -7,7 +7,7 @@ public class Token {
 	
   public static final int CHAR = 0;
   public static final int ELSE = 1;
-  public static final int FALSE = 2;
+  public static final int FALSE = 2; //false 6/6
   public static final int IF = 3;
   public static final int INT = 4;
   public static final int MAIN = 5;
@@ -26,6 +26,10 @@ public class Token {
   public static final int LITERALSTRING  = 18;
   public static final int LITERALCHAR = 19;
   public static final int PONTUACAO = 20;
+  //novo
+  public static final int LITERALFLOAT = 21; // token literal float
+  public static final int TRUE = 22; // token true
+  public static final int BITWISE = 23;
 
   
   // Valor fim de Arquivo
@@ -33,6 +37,8 @@ public class Token {
   public static final int EOF   = 100;
 
   // Valores para tokens RELOP
+    //Token RELOP representa operadores
+    // relacionais: <, <=, >, >=, ==, !=
 
   public static final int LT = 1;
   public static final int LE = 2;
@@ -42,23 +48,37 @@ public class Token {
   public static final int NE = 6;
 
   // Valores para tokens AUX
+    //Token AUX representa o operador de atribuição '='
 
   public static final int ATR = 1;
   
   // Valores para tokens OP
+    //Token OP representa
+    // operadores aritméticos: +, -, *, /,
+    // %, ++, --, +=, -=
 
   public static final int AD = 1;
   public static final int SUB = 2;
   public static final int DIV = 3;
   public static final int MUL = 4;
-  
+
+  //novo
+  public static final int MOD = 5;         // '%'
+  public static final int INC = 6;         // '++'
+  public static final int DEC = 7;         // '--'
+  public static final int AD_ASSIGN = 8;         // '+='
+  public static final int SUB_ASSIGN = 9;         // '-='
+  public static final int EXP = 12;         // '**' 2/6 exponenciação
+
   // Valores para tokens LOG
+    //Token LOG representa operadores lógicos: &&, ||, !
 
   public static final int AND = 1;
   public static final int OR = 2;
   public static final int NOT = 3;
 
   // Valores para tokens PONTUACAO
+    //Token PONTUACAO representa sinais de pontuação: ( ) { } ; ,
 	
   public static final int AP = 1;
   public static final int FP = 2;
@@ -66,6 +86,9 @@ public class Token {
   public static final int FC = 4;
   public static final int PV = 5;
   public static final int VG = 6;
+
+  public static final int SHL = 1; // <<
+  public static final int SHR = 2; // >>
 
   
   // Atributos
@@ -127,10 +150,14 @@ public class Token {
 	            break;  
 	
       case PONTUACAO: valorString = tipoPontuacao( (Integer) valor );  
-                      break;  
-     
+                break;
+
+      case BITWISE:
+          valorString = tipoBitwise((Integer) valor);
+                break;
+
       default: {
-	
+
 	    if( valor != null ) {
 		 
 	      valorString = valor.toString().trim();
@@ -157,7 +184,7 @@ public class Token {
 	    case ELSE: resultado = "else";
 			       break;
 		
-	    case FALSE: resultado = "false";
+	    case FALSE: resultado = "false"; // false 6/6
 				    break;
 	 
 	    case IF: resultado = "if";
@@ -212,8 +239,15 @@ public class Token {
 	    		    break;			
 
 	    case PONTUACAO: resultado = "pontuação";
-	    	        break;			
+	    	        break;
+        //NOVO
+        case LITERALFLOAT: resultado = "literalFloat"; // literal float 1/6
+                    break;
 
+        case TRUE: resultado = "true"; // true 5/6
+                    break;
+        case BITWISE: resultado = "bitwise"; // bitwise 3/6 4/6
+                    break;
       }
 	
       return resultado;
@@ -255,20 +289,32 @@ public class Token {
     String resultado = "Erro";
    
     switch ( tipo1.intValue() ) {
-	
+
       case AD: resultado = "+";
 			   break;
-	
+
       case SUB: resultado = "-";
 			    break;
-	
+
       case MUL: resultado = "*";
 			    break;
-	
+
       case DIV: resultado = "/";
 			    break;
-
-    }
+        //NOVO
+      case EXP: resultado = "**"; // exponenciação op 2/6
+                break;
+      case MOD: resultado = "%"; // modulo(resto) op 1/3
+                break;
+      case INC: resultado = "++";// incremento op 2/3
+                break;
+      case DEC: resultado = "--"; // decremento op 3/3
+                break;
+      case AD_ASSIGN: resultado = "+="; // op de atribuição de soma 4/3
+                break;
+      case SUB_ASSIGN: resultado = "-="; // op de atribuição de subtração 5/3
+                break;
+      }
 
     return resultado;
 
@@ -294,6 +340,19 @@ public class Token {
     return resultado;
 
   }
+    private String tipoBitwise(Integer bitwise) {
+
+        String resultado = "Erro";
+        switch (bitwise.intValue()) {
+            case SHL:
+                resultado = "<<";
+                break;
+            case SHR:
+                resultado = ">>";
+                break;
+        }
+        return resultado;
+    }
  
   private String tipoPontuacao(Integer valor2) {
 

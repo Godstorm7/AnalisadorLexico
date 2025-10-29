@@ -1,0 +1,37 @@
+adicione ao seu parser
+: literalFloat ok, operador de exponenciação ok +- (ao inves de Math.pow),
+ <<, >>, true, false, +=, -=, *=, /=, >=, <=, ==, !=
+
+3.14
+ok no analisador lexico
+
+**
+ok no analisador lexico
+
+<<
+ok no analisador lexico
+
+>>
+ok no analisador lexico
+
+true
+ok no analisador lexico
+
+false
+ok no analisador lexico
+
+
+%
+ok no analisador lexico
+
+++
+ok no analisador lexico
+
+--
+ok no analisador lexico
+
++=
+ok no analisador lexico
+
+-=
+ok no analisador lexico

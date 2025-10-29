@@ -20,8 +20,7 @@ public class AnalisadorLexico {
 	this.reader = reader;
 	
   }
-	
-  //método usado para reconhecer os tokens. no final, ele gera um token ou lança uma exception caso nao reconheça a cadeia
+
   public Token pegarProximoToken() throws IOException, LexerException {
 			
 	boolean feito = false;
@@ -83,31 +82,22 @@ public class AnalisadorLexico {
 		      valorAtual = new Integer( Token.NOT );
 		      
 		    }break;
-		    
+		    // MODIFICADO AQUI
 		    case '+': {
-		    	
-		      tipoAtual = Token.OP;
-		      valorAtual = new Integer( Token.AD );
-		      
-		      feito = true;
+
+                estado = 51; // novo estado para +/++/+=
 		      
 		    }break;
 
 		    case '-': {
-			      
-		      tipoAtual = Token.OP;
-			  valorAtual = new Integer( Token.SUB );
-			  
-		      feito = true;
+
+                estado = 52; // novo estado para -/--/-=
 			  
 		    }break;
 
 		    case '*': {
-			  
-		      tipoAtual = Token.OP;
-			  valorAtual = new Integer( Token.MUL );
-			 
-			  feito = true;
+
+                estado = 50; // novo estado para */**
 			  
 		    }break;
 
@@ -183,6 +173,14 @@ public class AnalisadorLexico {
 			  feito = true;
 			
 		    }break;
+
+            case '%': {
+
+              tipoAtual = Token.OP;
+              valorAtual = new Integer( Token.MOD );
+
+              feito = true;
+            }break;
 			  
 		    default:{
 		    
@@ -198,11 +196,16 @@ public class AnalisadorLexico {
 		case 1: {
 					
 		  if ( caractere == '=' ) {
-						
+
 		    valorAtual = new Integer( Token.LE );
 			feito = true;
-			
-		  } else {
+			// novo <<
+		  } else if (caractere == '<') {
+              tipoAtual = Token.BITWISE;
+              valorAtual = new Integer( Token.SHL );
+              feito = true;
+
+          } else {
 						
 		    retoneparaBuffer( caractere );
 			feito = true;
@@ -252,8 +255,13 @@ public class AnalisadorLexico {
 							
 			valorAtual = new Integer( Token.GE );
 			feito = true;
-			
-		  } else {
+			//novo
+		  } else if (caractere == '>') {
+              // >>
+              tipoAtual = Token.BITWISE;
+              valorAtual = new Integer( Token.SHR );
+              feito = true;
+          } else {
 								
 			retoneparaBuffer( caractere );
 			feito = true;			
@@ -294,8 +302,7 @@ public class AnalisadorLexico {
 		      estado = 0;
 	  	
 		    }
-		    
-		  } else {
+          } else {
 			  
             tipoAtual = Token.OP;
             valorAtual = new Integer( Token.DIV );
@@ -436,7 +443,12 @@ public class AnalisadorLexico {
 		    estado = 39;
 			sBuffer.append( ( char) caractere );
 			
-		  } else {
+		  } else if (caractere == '.') {
+              estado = 40; // estado para ponto decimal
+              sBuffer.append( (char) caractere );
+              tipoAtual = Token.LITERALFLOAT;
+
+          } else {
 
 		    retoneparaBuffer( caractere );  
 			
@@ -596,12 +608,75 @@ public class AnalisadorLexico {
 		  }
 		  
 		}break;
+          case 40: {
+              if (Character.isDigit(caractere)) {
+                  estado = 40;
+                  sBuffer.append((char) caractere);
+
+              } else {
+
+                  retoneparaBuffer(caractere);
+
+                  valorAtual = sBuffer.toString();
+                  tipoAtual = Token.LITERALFLOAT;
+                  feito = true;
+
+              }
+          }
+          break;
+          case 50: { // estado apos ler '*'
+              // pode ser '**' ou '*'
+              if (caractere == '*'){
+                    tipoAtual = Token.OP;
+                    valorAtual = new Integer( Token.EXP );
+                    feito = true;
+                } else {
+                    retoneparaBuffer( caractere );
+                    tipoAtual = Token.OP;
+                    valorAtual = new Integer( Token.MUL );
+                    feito = true;
+              }
+          }break;
+          case 51: { // estado apos ler '+'
+                if (caractere == '+'){
+                        tipoAtual = Token.OP;
+                        valorAtual = new Integer( Token.INC );
+                        feito = true;
+                    } else if (caractere == '='){
+                        tipoAtual = Token.OP;
+                        valorAtual = new Integer( Token.AD_ASSIGN );
+                        feito = true;
+                    } else {
+                        retoneparaBuffer( caractere );
+                        tipoAtual = Token.OP;
+                        valorAtual = new Integer( Token.AD );
+                        feito = true;
+                }
+          }break;
+          case 52: {
+                if (caractere == '-'){
+                        tipoAtual = Token.OP;
+                        valorAtual = new Integer( Token.DEC );
+                        feito = true;
+                    } else if (caractere == '='){
+                        tipoAtual = Token.OP;
+                        valorAtual = new Integer( Token.SUB_ASSIGN );
+                        feito = true;
+                    } else {
+                        retoneparaBuffer( caractere );
+                        tipoAtual = Token.OP;
+                        valorAtual = new Integer( Token.SUB );
+                        feito = true;
+                }
+          }break;
 		
 		default: {
 						
-		  throw new Error("Estado nao esperado!!!");
+		  throw new Error("Estado nao esperado!!!" +
+                  "Estado: " + estado);
 			
 		}
+
 		
 	  }
 		
